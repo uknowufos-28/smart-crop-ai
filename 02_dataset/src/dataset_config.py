@@ -58,6 +58,13 @@ class DatasetConfig:
         ]
     )
 
+    # Dataset Split & Augmentation Parameters
+    TRAIN_RATIO: float = 0.8
+    VAL_RATIO: float = 0.1
+    TEST_RATIO: float = 0.1
+    RANDOM_SEED: int = 42
+    AUGMENT_FACTOR: int = 2  # Number of augmented copies per training image
+
     def validate(self) -> None:
         """Ensures configuration constraints are logically sound."""
         if self.MIN_WIDTH <= 0 or self.MIN_HEIGHT <= 0:
@@ -66,3 +73,11 @@ class DatasetConfig:
             )
         if not self.TARGET_CLASSES:
             raise ValueError("TARGET_CLASSES list cannot be empty.")
+        
+        # Enforce that train + val + test ratios sum up to 1.0
+        total_ratio = round(self.TRAIN_RATIO + self.VAL_RATIO + self.TEST_RATIO, 5)
+        if total_ratio != 1.0:
+            raise ValueError(
+                f"Dataset split ratios (train={self.TRAIN_RATIO}, val={self.VAL_RATIO}, test={self.TEST_RATIO}) must sum to 1.0. Got {total_ratio}"
+            )
+
