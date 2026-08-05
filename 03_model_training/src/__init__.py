@@ -1,0 +1,3 @@
+"""
+SmartCropAI Model Training Package
+"""
