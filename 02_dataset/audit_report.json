@@ -1,0 +1,19 @@
+{
+  "target_directory": "/home/omee/Documents/crop/02_dataset/raw",
+  "total_files_scanned": 10,
+  "valid_images": 10,
+  "corrupt_files_flagged": 0,
+  "class_distribution": {
+    "Tomato___Healthy": 1,
+    "Potato___Late_blight": 1,
+    "Tomato___Late_blight": 1,
+    "Tomato___Early_blight": 1,
+    "Corn___Common_rust": 1,
+    "Tomato___Bacterial_spot": 1,
+    "Potato___Healthy": 1,
+    "Corn___Northern_Leaf_Blight": 1,
+    "Potato___Early_blight": 1,
+    "Corn___Healthy": 1
+  },
+  "error_log": {}
+}
