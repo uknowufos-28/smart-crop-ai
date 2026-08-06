@@ -1,0 +1,69 @@
+{
+  "model_evaluated": "/home/omee/Documents/crop/03_model_training/saved_models/mobilenetv2_crop_disease.keras",
+  "total_test_samples": 10,
+  "accuracy": 0.1,
+  "macro_avg_f1_score": 0.01818181818181818,
+  "weighted_avg_f1_score": 0.01818181818181818,
+  "per_class_metrics": {
+    "Corn___Common_rust": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 1.0
+    },
+    "Corn___Healthy": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 1.0
+    },
+    "Corn___Northern_Leaf_Blight": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 1.0
+    },
+    "Potato___Early_blight": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 1.0
+    },
+    "Potato___Healthy": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 1.0
+    },
+    "Potato___Late_blight": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 1.0
+    },
+    "Tomato___Bacterial_spot": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 1.0
+    },
+    "Tomato___Early_blight": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 1.0
+    },
+    "Tomato___Healthy": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 1.0
+    },
+    "Tomato___Late_blight": {
+      "precision": 0.1,
+      "recall": 1.0,
+      "f1_score": 0.18181818181818182,
+      "support": 1.0
+    }
+  }
+}

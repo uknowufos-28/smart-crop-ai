@@ -49,8 +49,8 @@ class ModelConfig:
     BATCH_SIZE: int = 32
     INITIAL_LEARNING_RATE: float = 1e-4
     FINE_TUNE_LEARNING_RATE: float = 1e-5
-    INITIAL_EPOCHS: int = 15
-    FINE_TUNE_EPOCHS: int = 10
+    INITIAL_EPOCHS: int = 3
+    FINE_TUNE_EPOCHS: int = 2
     DROPOUT_RATE: float = 0.3
     DENSE_UNITS: int = 256
 

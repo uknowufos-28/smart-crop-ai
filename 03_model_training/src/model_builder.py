@@ -55,12 +55,23 @@ class CropDiseaseModelBuilder:
         # 2. MobileNetV2 Standard Preprocessing [-1, 1]
         x = tf.keras.applications.mobilenet_v2.preprocess_input(inputs)
 
-        # 3. Base MobileNetV2 Backbone (Pretrained on ImageNet)
-        base_model = tf.keras.applications.MobileNetV2(
-            input_shape=self.config.INPUT_SHAPE,
-            include_top=False,
-            weights="imagenet",
-        )
+        # 3. Base MobileNetV2 Backbone (Pretrained on ImageNet with offline fallback)
+        try:
+            base_model = tf.keras.applications.MobileNetV2(
+                input_shape=self.config.INPUT_SHAPE,
+                include_top=False,
+                weights="imagenet",
+            )
+            logger.info("Successfully loaded pre-trained ImageNet weights for MobileNetV2.")
+        except Exception as err:
+            logger.warning(
+                f"Could not fetch ImageNet weights ({str(err)}). Falling back to random weight initialization (weights=None)."
+            )
+            base_model = tf.keras.applications.MobileNetV2(
+                input_shape=self.config.INPUT_SHAPE,
+                include_top=False,
+                weights=None,
+            )
 
         # Freeze base backbone layers for initial transfer learning
         base_model.trainable = False

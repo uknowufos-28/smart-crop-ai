@@ -1,39 +1,39 @@
 # Module 03: Deep Learning Model Training Engine (`03_model_training`)
 
-This module houses the TensorFlow / Keras deep learning model architecture setup, transfer learning routines, training callbacks, fine-tuning scripts, and loss/accuracy matrix generators for SmartCropAI.
+This module houses the TensorFlow / Keras deep learning model architecture setup, transfer learning routines, two-stage fine-tuning engines, Keras checkpoint callbacks, and model evaluation suites for SmartCropAI.
 
 ## Directory Layout
 ```
 03_model_training/
-├── requirements.txt         # Module dependencies (TensorFlow, NumPy, Matplotlib, Scikit-Learn)
+├── requirements.txt         # Module dependencies
+├── training_history.json    # JSON report of training loss & accuracy metrics
+├── evaluation_report.json   # JSON report of test set Precision, Recall, and F1-Scores
+├── confusion_matrix.png     # Visual $10 \times 10$ Confusion Matrix plot image
 ├── README.md                # Module documentation
 ├── src/
 │   ├── __init__.py
 │   ├── model_config.py      # Dataclass hyperparameters & directory constants
-│   └── model_builder.py     # MobileNetV2 architecture generator & transfer learning head
+│   ├── model_builder.py     # MobileNetV2 architecture generator & transfer learning head
+│   ├── train_model.py       # Production two-stage model training & fine-tuning engine
+│   └── evaluate_model.py    # Model evaluation, confusion matrix & metrics generator
 ├── saved_models/            # Exported Keras models (.keras / .h5) (Git-ignored)
 ├── checkpoints/             # Best model training checkpoints (Git-ignored)
 └── logs/                    # TensorBoard training log files (Git-ignored)
 ```
 
-## Running Model Architecture Builder
+## Running Evaluation Suite
 
 ```bash
-# 1. Install dependencies
-pip3 install -r requirements.txt
+# 1. Activate virtual environment
+source .venv/bin/activate
 
-# 2. Run model architecture builder & parameter summary
+# 2. Execute model evaluation
 cd 03_model_training
-python3 src/model_builder.py
+python src/evaluate_model.py
 ```
 
-### Architecture Specifications:
-- **Base Model**: MobileNetV2 pre-trained on ImageNet (frozen backbone).
-- **Input Tensor**: $(224 \times 224 \times 3)$ RGB leaf image.
-- **Preprocessing**: `mobilenet_v2.preprocess_input` (rescaling to $[-1, 1]$).
-- **Classification Head**:
-  - `GlobalAveragePooling2D` (Compresses feature maps to 1280 vector).
-  - `Dense(256, activation='relu', L2 regularized)`.
-  - `BatchNormalization`.
-  - `Dropout(0.3)`.
-  - `Dense(10, activation='softmax')` output layer.
+### Features Included:
+- **Inference Pass**: Executes non-shuffled inference across `02_dataset/processed/test/`.
+- **Classification Metrics**: Calculates per-class Precision, Recall, F1-Scores, and macro/weighted averages using Scikit-Learn.
+- **Confusion Matrix Heatmap**: Plots high-resolution $10 \times 10$ heatmap image (`confusion_matrix.png`).
+- **Telemetry Export**: Saves evaluation report to `evaluation_report.json`.
