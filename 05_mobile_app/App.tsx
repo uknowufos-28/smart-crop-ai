@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, StatusBar, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, StatusBar, ScrollView, ActivityIndicator, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { AlertCircle, Zap, ShieldCheck } from "lucide-react-native";
+import { AlertCircle, Zap, ShieldCheck, CloudUpload, RefreshCw } from "lucide-react-native";
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from "./src/constants/theme";
 import { CameraScanner } from "./src/components/CameraScanner";
 import { tfliteService, PredictionResult } from "./src/services/tfliteService";
+import { syncService } from "./src/services/syncService";
 
 /**
  * SmartCropAI Root Application Entry Point.
@@ -12,7 +13,9 @@ import { tfliteService, PredictionResult } from "./src/services/tfliteService";
 export default function App() {
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
+  const [pendingCount, setPendingCount] = useState<number>(syncService.getPendingQueue().length);
 
   const handleImageCaptured = async (uri: string) => {
     setSelectedImageUri(uri);
@@ -22,10 +25,25 @@ export default function App() {
     try {
       const result = await tfliteService.classifyLeafImage(uri);
       setPrediction(result);
+      await syncService.enqueueDiagnosis(result);
+      setPendingCount(syncService.getPendingQueue().length);
     } catch (err) {
       console.error("Diagnostic inference error:", err);
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleSyncTelemetry = async () => {
+    setIsSyncing(true);
+    try {
+      const res = await syncService.syncPendingDiagnoses();
+      setPendingCount(syncService.getPendingQueue().length);
+      Alert.alert(res.success ? "Cloud Telemetry Synced" : "Sync Status", res.message);
+    } catch (error: any) {
+      Alert.alert("Sync Error", error.message || "Failed connecting to backend API.");
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -47,6 +65,20 @@ export default function App() {
             <Text style={TYPOGRAPHY.bodyMedium}>
               MobileNetV2 INT8 quantized model loaded (2.93 MB). Fast on-host inference (&lt;150ms) without cellular connection.
             </Text>
+
+            {/* Cloud Sync Telemetry Banner */}
+            <TouchableOpacity
+              style={styles.syncBannerButton}
+              onPress={handleSyncTelemetry}
+              disabled={isSyncing}
+            >
+              <CloudUpload size={18} color={COLORS.primaryLight} />
+              <Text style={styles.syncBannerText}>
+                {isSyncing
+                  ? "Syncing Telemetry to Cloud..."
+                  : `Sync ${pendingCount} Pending Scans to Cloud`}
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {/* Live Camera Leaf Scanner Component */}
@@ -221,6 +253,23 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     fontWeight: "600",
     fontSize: 14,
+    marginLeft: SPACING.xs,
+  },
+  syncBannerButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.surfaceElevated,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.md,
+    marginTop: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.primaryDark,
+  },
+  syncBannerText: {
+    color: COLORS.primaryLight,
+    fontWeight: "600",
+    fontSize: 13,
     marginLeft: SPACING.xs,
   },
 });

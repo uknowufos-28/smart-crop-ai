@@ -8,7 +8,7 @@ Cross-platform React Native & Expo mobile application powering real-time, offlin
 ├── package.json          # React Native & Expo dependencies
 ├── tsconfig.json         # Expo TypeScript compiler configuration
 ├── app.json              # Expo application configuration & camera permissions
-├── App.tsx               # Root application entry point with Diagnostic AI Result Card
+├── App.tsx               # Root application entry point with AI Result Card & Cloud Sync Banner
 ├── README.md             # Module documentation
 └── src/
     ├── components/
@@ -17,9 +17,16 @@ Cross-platform React Native & Expo mobile application powering real-time, offlin
     │   ├── classes.ts        # Master class index catalog (10 crop disease classes)
     │   └── theme.ts          # Dark-mode agricultural design system & color tokens
     └── services/
-        └── tfliteService.ts  # On-device TFLite mobile inference & image scaling engine
+        ├── tfliteService.ts  # On-device TFLite mobile inference & image scaling engine
+        └── syncService.ts    # Offline scan queue & Cloud REST API sync manager
 ```
 
 ## Features Included:
-- **TFLite Mobile Inference Service (`tfliteService.ts`)**: Loads INT8 quantized MobileNetV2 model buffer ($2.93\text{ MB}$), scales image tensor inputs to $[-1.0, 1.0]$, executes on-host predictions in $<150\text{ms}$, and maps output class indexes to human-readable crop & disease names.
-- **Diagnostic Result Card (`App.tsx`)**: Displays real-time diagnosis results showing detected Crop Name badge, Disease Name header, Confidence Score pill (e.g. 96.8%), Inference Latency badge (ms), and organic treatment remedy recommendations.
+- **Offline Telemetry Sync Manager (`syncService.ts`)**:
+  - Enqueues diagnostic AI scan logs into local memory/AsyncStorage queues (`enqueueDiagnosis`).
+  - Tracks pending offline scan queue count.
+  - Sends bulk batch POST requests to `http://localhost:5000/api/v1/diagnoses/sync` (`syncPendingDiagnoses`).
+  - Automatically clears queued items upon receiving HTTP 201 response from cloud REST API.
+- **Cloud Sync Telemetry Banner (`App.tsx`)**:
+  - Displays interactive banner showing count of pending offline scans.
+  - Triggers one-tap background telemetry sync to cloud backend DB.
