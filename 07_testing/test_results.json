@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-08-06T08:00:16Z",
+  "passed_tests": 3,
+  "total_tests": 4,
+  "success_rate_pct": 75.0,
+  "test_cases": [
+    {
+      "test_name": "Dataset Integrity",
+      "status": "PASSED",
+      "details": "Verified 10 test images (224x224 RGB, 0 corruptions).",
+      "duration_ms": 6.06
+    },
+    {
+      "test_name": "Keras Model Contract",
+      "status": "PASSED",
+      "details": "Model input (None, 224, 224, 3) -> output (None, 10) contract valid.",
+      "duration_ms": 2368.81
+    },
+    {
+      "test_name": "TFLite INT8 Quantization",
+      "status": "PASSED",
+      "details": "Binary size 2.93 MB <= 5MB target, TFLite tensor allocation clean.",
+      "duration_ms": 2.44
+    },
+    {
+      "test_name": "Backend Health API",
+      "status": "SKIPPED/OPTIONAL",
+      "details": "Backend server offline on localhost:5000 (<urlopen error [Errno 111] Connection refused>). Start server via 06_backend/ npm run dev.",
+      "duration_ms": 13.2
+    }
+  ]
+}
