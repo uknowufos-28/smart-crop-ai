@@ -145,11 +145,14 @@ class DatasetAuditor:
             class_dir = os.path.join(base_dir, class_name)
             os.makedirs(class_dir, exist_ok=True)
 
-            # Create a sample valid 256x256 RGB image for each class
-            sample_img_path = os.path.join(class_dir, "sample_001.jpg")
-            if not os.path.exists(sample_img_path):
-                img = Image.new("RGB", (256, 256), color=(34, 139, 34))  # Forest green leaf base
-                img.save(sample_img_path, format="JPEG", quality=90)
+            # Create 5 sample valid 256x256 RGB images per class to populate train, val, and test splits
+            for i in range(1, 6):
+                sample_img_path = os.path.join(class_dir, f"sample_{i:03d}.jpg")
+                if not os.path.exists(sample_img_path):
+                    # Slight variation in green intensity for sample diversity
+                    green_val = 139 + (i * 10)
+                    img = Image.new("RGB", (256, 256), color=(34, green_val, 34))
+                    img.save(sample_img_path, format="JPEG", quality=90)
 
 
 if __name__ == "__main__":

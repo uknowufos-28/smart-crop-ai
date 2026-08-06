@@ -137,13 +137,17 @@ class PreprocessAndAugmentEngine:
 
             # Compute split boundaries
             n_total = len(image_files)
-            n_train = int(n_total * self.config.TRAIN_RATIO)
-            n_val = int(n_total * self.config.VAL_RATIO)
-            # Remaining files go to test set
-            
-            train_files = image_files[:n_train] if n_train > 0 else image_files[:1]
-            val_files = image_files[n_train:n_train + n_val]
-            test_files = image_files[n_train + n_val:]
+            if n_total < 3:
+                # For small sample test sets, populate all splits to allow pipeline validation
+                train_files = image_files
+                val_files = image_files
+                test_files = image_files
+            else:
+                n_train = int(n_total * self.config.TRAIN_RATIO)
+                n_val = int(n_total * self.config.VAL_RATIO)
+                train_files = image_files[:n_train]
+                val_files = image_files[n_train:n_train + n_val]
+                test_files = image_files[n_train + n_val:]
 
             file_splits = {
                 "train": train_files,
