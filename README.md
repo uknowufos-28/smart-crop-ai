@@ -1,6 +1,6 @@
 # 🌱 SmartCropAI: Offline-First Edge AI Crop Disease Diagnostic System
 
-[![Download APK](https://img.shields.io/badge/Download_APK-v1.0.0-166534?style=for-the-badge&logo=android&logoColor=white)](https://github.com/uknowufos-28/smart-crop-ai/releases/download/v1.0.0/SmartCropAI-v1.0.0.apk)
+[![Download APK](https://img.shields.io/badge/Download_APK-v1.0.0-166534?style=for-the-badge&logo=android&logoColor=white)](https://github.com/uknowufos-28/smart-crop-ai/releases/latest)
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=github-actions)](https://github.com/uknowufos-28/smart-crop-ai)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 [![TensorFlow Lite](https://img.shields.io/badge/TensorFlow_Lite-INT8_Quantized-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/lite)
@@ -23,7 +23,7 @@ Featuring a **ChatGPT-Inspired Minimalist UI** (Light, Dark, and System theme), 
 
 ## 📲 Download & Installation Guide
 
-1. Click **[Download APK v1.0.0](https://github.com/uknowufos-28/smart-crop-ai/releases/download/v1.0.0/SmartCropAI-v1.0.0.apk)** directly to your Android device.
+1. Click **[Download APK v1.0.0](https://github.com/uknowufos-28/smart-crop-ai/releases/latest)** directly to your Android device.
 2. Open the downloaded `SmartCropAI-v1.0.0.apk` file in your Android **Downloads** folder.
 3. If prompted by Android OS, tap **Settings ➔ Allow installation from unknown sources**.
 4. Tap **Install** and launch **SmartCropAI**—diagnose plant leaves 100% offline!
