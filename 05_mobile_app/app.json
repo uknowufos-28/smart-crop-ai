@@ -26,8 +26,7 @@
         {
           "photosPermission": "SmartCropAI requires photo library access to select crop leaf images for disease diagnosis."
         }
-      ],
-      "expo-sqlite"
+      ]
     ],
     "ios": {
       "supportsTablet": true,
