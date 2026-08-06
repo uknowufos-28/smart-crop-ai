@@ -14,6 +14,21 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "SmartCropAI requires camera access to scan crop leaves and diagnose plant diseases on-device."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "SmartCropAI requires photo library access to select crop leaf images for disease diagnosis."
+        }
+      ],
+      "expo-sqlite"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.smartcropai.app",
