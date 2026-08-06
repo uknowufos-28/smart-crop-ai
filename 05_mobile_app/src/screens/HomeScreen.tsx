@@ -71,7 +71,7 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.primaryCardHeader}>
           <View style={styles.badge}>
             <Cpu size={14} color="#FFFFFF" />
-            <Text style={styles.badgeText}>INT8 TFLite Engine (<5ms)</Text>
+            <Text style={styles.badgeText}>INT8 TFLite Engine ({"<5ms"})</Text>
           </View>
         </View>
         <Text style={styles.primaryCardTitle}>Scan Crop Leaf</Text>
