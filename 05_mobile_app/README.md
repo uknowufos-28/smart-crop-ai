@@ -11,22 +11,16 @@ Cross-platform React Native & Expo mobile application powering real-time, offlin
 ├── App.tsx               # Root application entry point
 ├── README.md             # Module documentation
 └── src/
+    ├── components/
+    │   └── CameraScanner.tsx # Live camera leaf capture & photo gallery picker
     └── constants/
         └── theme.ts      # Dark-mode agricultural design system & color tokens
 ```
 
-## Running Mobile App in Development
-
-```bash
-# 1. Install dependencies
-cd 05_mobile_app
-npm install
-
-# 2. Start Expo dev server
-npm start
-```
-
-### Features Included:
-- **Theme Design System**: Dark-mode agricultural palette (`#16A34A` Emerald Green, `#0F172A` Deep Slate), typography tokens, and spacing rules for high outdoor field visibility.
-- **Camera & Photo Library Permissions**: Configured iOS Info.plist strings and Android permission manifests for camera access.
-- **SafeArea Integration**: Integrates `react-native-safe-area-context` ensuring UI renders cleanly across notched mobile displays.
+## Features Included:
+- **Live Camera Scanner Component (`CameraScanner.tsx`)**:
+  - `CameraView` live viewport with viewfinder target box framing guide.
+  - Camera permissions check (`useCameraPermissions`).
+  - Flash/Torch mode toggle (on/off for dark field conditions).
+  - Shutter capture button (`takePictureAsync`) and gallery photo picker (`launchImageLibraryAsync`).
+  - High-contrast leaf image selection preview screen with retake callback.
