@@ -1,0 +1,20 @@
+{
+  "keras_source_model": "/home/omee/Documents/crop/03_model_training/saved_models/mobilenetv2_crop_disease.keras",
+  "models_exported": {
+    "float32": {
+      "path": "/home/omee/Documents/crop/04_model_conversion/samples/crop_disease_model_float32.tflite",
+      "size_mb": 9.74,
+      "compression_ratio": "1.0x"
+    },
+    "float16": {
+      "path": "/home/omee/Documents/crop/04_model_conversion/samples/crop_disease_model_fp16.tflite",
+      "size_mb": 4.94,
+      "compression_ratio": "1.97x"
+    },
+    "int8": {
+      "path": "/home/omee/Documents/crop/04_model_conversion/samples/crop_disease_model_int8.tflite",
+      "size_mb": 2.93,
+      "compression_ratio": "3.32x"
+    }
+  }
+}
