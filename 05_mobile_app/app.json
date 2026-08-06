@@ -5,26 +5,28 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0F172A"
+      "backgroundColor": "#FFFFFF"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.smartcropai.app",
       "infoPlist": {
         "NSCameraUsageDescription": "SmartCropAI requires camera access to scan crop leaves and diagnose plant diseases on-device.",
         "NSPhotoLibraryUsageDescription": "SmartCropAI requires photo library access to select crop leaf images for disease diagnosis."
       }
     },
     "android": {
+      "package": "com.smartcropai.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0F172A"
+        "backgroundColor": "#FFFFFF"
       },
       "permissions": [
         "CAMERA",
@@ -34,6 +36,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "48df946f-6c82-4f6e-95e2-3c110dd5d1e5"
+      }
     }
   }
 }

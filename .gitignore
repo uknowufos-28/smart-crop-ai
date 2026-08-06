@@ -1,55 +1,60 @@
-# SmartCropAI Enterprise Git Exclusion Policy
+# ==========================================
+# SmartCropAI Enterprise Unified .gitignore
+# Merged Rules for Python, Node.js, & React Native/Expo
+# ==========================================
 
-# 02_dataset/ - Exclude raw, temporary, and large image datasets
-02_dataset/raw/
-02_dataset/processed/
-02_dataset/*.zip
-02_dataset/*.tar.gz
-
-# 03_model_training/ - Exclude trained model checkpoints & weights
-03_model_training/checkpoints/
-03_model_training/saved_models/
-03_model_training/*.h5
-03_model_training/*.pb
-03_model_training/*.keras
-03_model_training/logs/
-03_model_training/.venv/
-
-# 04_model_conversion/ - Exclude raw intermediate exported binaries
-04_model_conversion/*.tflite
-04_model_conversion/*.onnx
-!04_model_conversion/samples/
-
-# 05_mobile_app/ - Exclude React Native dependencies and build outputs
-05_mobile_app/node_modules/
-05_mobile_app/.expo/
-05_mobile_app/android/.gradle/
-05_mobile_app/android/app/build/
-05_mobile_app/ios/Pods/
-05_mobile_app/ios/build/
-05_mobile_app/*.apk
-05_mobile_app/*.aab
-05_mobile_app/*.ipa
-
-# 06_backend/ - Exclude Node.js dependencies and environment secrets
-06_backend/node_modules/
-06_backend/dist/
-06_backend/.env
-06_backend/.env.*
-!06_backend/.env.example
-
-# 07_testing/ - Exclude test logs & coverage reports
-07_testing/coverage/
-07_testing/logs/
-
-# 08_deployment/ - Exclude local secrets and build artifacts
-08_deployment/secrets/
-
-# Global OS & IDE System Files
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
-*.log
+# 1. Node.js & React Native / Expo
+node_modules/
 npm-debug.log*
 yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.expo/
+.expo-shared/
+web-build/
+dist/
+build/
+.next/
+
+# 2. Environment Variables & Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+
+# 3. Python & Machine Learning
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+*.keras
+
+# 4. OS & IDE Specific Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 5. Raw Large Datasets (Exclude raw un-split image zips)
+02_dataset/raw_download/
+*.zip
+*.tar.gz
