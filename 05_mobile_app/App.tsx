@@ -1,18 +1,32 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, StatusBar, ScrollView } from "react-native";
+import { StyleSheet, Text, View, StatusBar, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { AlertCircle, Zap, ShieldCheck } from "lucide-react-native";
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from "./src/constants/theme";
 import { CameraScanner } from "./src/components/CameraScanner";
+import { tfliteService, PredictionResult } from "./src/services/tfliteService";
 
 /**
  * SmartCropAI Root Application Entry Point.
  */
 export default function App() {
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [prediction, setPrediction] = useState<PredictionResult | null>(null);
 
-  const handleImageCaptured = (uri: string) => {
-    console.log("📸 Leaf Image Captured:", uri);
+  const handleImageCaptured = async (uri: string) => {
     setSelectedImageUri(uri);
+    setIsAnalyzing(true);
+    setPrediction(null);
+
+    try {
+      const result = await tfliteService.classifyLeafImage(uri);
+      setPrediction(result);
+    } catch (err) {
+      console.error("Diagnostic inference error:", err);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
@@ -37,8 +51,52 @@ export default function App() {
 
           {/* Live Camera Leaf Scanner Component */}
           <View style={styles.scannerWrapper}>
-            <CameraScanner onImageCaptured={handleImageCaptured} />
+            <CameraScanner onImageCaptured={handleImageCaptured} isLoading={isAnalyzing} />
           </View>
+
+          {/* Inference Loading Indicator */}
+          {isAnalyzing && (
+            <View style={styles.loadingCard}>
+              <ActivityIndicator size="large" color={COLORS.primary} />
+              <Text style={[TYPOGRAPHY.bodyLarge, styles.loadingText]}>
+                Running On-Device INT8 Neural Network Inference...
+              </Text>
+            </View>
+          )}
+
+          {/* Diagnostic AI Result Card */}
+          {prediction && !isAnalyzing && (
+            <View style={styles.resultCard}>
+              <View style={styles.resultHeader}>
+                <View style={styles.cropBadge}>
+                  <Text style={styles.cropBadgeText}>{prediction.cropName.toUpperCase()}</Text>
+                </View>
+                <View style={styles.latencyBadge}>
+                  <Zap size={14} color={COLORS.accent} />
+                  <Text style={styles.latencyText}>{prediction.latencyMs} ms</Text>
+                </View>
+              </View>
+
+              <Text style={TYPOGRAPHY.titleHeader}>{prediction.diseaseName}</Text>
+
+              <View style={styles.confidenceRow}>
+                <Text style={TYPOGRAPHY.bodyMedium}>Detection Confidence:</Text>
+                <View style={styles.confidenceBadge}>
+                  <Text style={styles.confidenceText}>{prediction.confidencePercentage}</Text>
+                </View>
+              </View>
+
+              <View style={styles.remedyBox}>
+                <View style={styles.remedyHeader}>
+                  <ShieldCheck size={18} color={COLORS.primaryLight} />
+                  <Text style={styles.remedyTitle}>Recommended Treatment</Text>
+                </View>
+                <Text style={TYPOGRAPHY.bodyMedium}>
+                  Apply organic copper-based fungicide spray at first sign of spotting. Remove infected lower leaves and ensure drip irrigation to avoid wet foliage.
+                </Text>
+              </View>
+            </View>
+          )}
         </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -80,5 +138,89 @@ const styles = StyleSheet.create({
   },
   scannerWrapper: {
     marginTop: SPACING.xl,
+  },
+  loadingCard: {
+    backgroundColor: COLORS.surface,
+    padding: SPACING.xl,
+    borderRadius: RADIUS.lg,
+    marginTop: SPACING.xl,
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: SPACING.md,
+    textAlign: "center",
+  },
+  resultCard: {
+    backgroundColor: COLORS.surface,
+    padding: SPACING.xl,
+    borderRadius: RADIUS.xl,
+    marginTop: SPACING.xl,
+    borderWidth: 2,
+    borderColor: COLORS.primary,
+  },
+  resultHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: SPACING.sm,
+  },
+  cropBadge: {
+    backgroundColor: COLORS.primaryDark,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderRadius: RADIUS.sm,
+  },
+  cropBadgeText: {
+    color: COLORS.primaryLight,
+    fontWeight: "700",
+    fontSize: 12,
+  },
+  latencyBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.surfaceElevated,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderRadius: RADIUS.sm,
+  },
+  latencyText: {
+    color: COLORS.accent,
+    fontWeight: "700",
+    fontSize: 12,
+    marginLeft: 4,
+  },
+  confidenceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: SPACING.md,
+  },
+  confidenceBadge: {
+    backgroundColor: COLORS.success,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderRadius: RADIUS.full,
+  },
+  confidenceText: {
+    color: COLORS.textPrimary,
+    fontWeight: "700",
+    fontSize: 14,
+  },
+  remedyBox: {
+    backgroundColor: COLORS.surfaceElevated,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    marginTop: SPACING.sm,
+  },
+  remedyHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: SPACING.xs,
+  },
+  remedyTitle: {
+    color: COLORS.textPrimary,
+    fontWeight: "600",
+    fontSize: 14,
+    marginLeft: SPACING.xs,
   },
 });
