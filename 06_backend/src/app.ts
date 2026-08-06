@@ -4,6 +4,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import { env } from "./config/env.js";
 import authRoutes from "./routes/authRoutes.js";
+import diagnosisRoutes from "./routes/diagnosisRoutes.js";
+import treatmentRoutes from "./routes/treatmentRoutes.js";
 
 /**
  * Production Express Application Configuration.
@@ -35,6 +37,8 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // 5. API Routes
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/diagnoses", diagnosisRoutes);
+app.use("/api/v1/treatments", treatmentRoutes);
 
 /**
  * @route GET /health
