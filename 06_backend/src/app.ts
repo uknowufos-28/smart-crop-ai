@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import { env } from "./config/env.js";
+import authRoutes from "./routes/authRoutes.js";
 
 /**
  * Production Express Application Configuration.
@@ -31,6 +32,9 @@ if (env.NODE_ENV === "development") {
 // 4. Body Parsers
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// 5. API Routes
+app.use("/api/v1/auth", authRoutes);
 
 /**
  * @route GET /health

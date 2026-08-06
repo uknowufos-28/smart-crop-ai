@@ -5,35 +5,31 @@ TypeScript Express REST API server backed by MongoDB for user authentication, di
 ## Directory Layout
 ```
 06_backend/
-├── package.json          # Node.js dependencies & scripts
+├── package.json          # Node.js dependencies & scripts (includes BCrypt & JWT)
 ├── tsconfig.json         # TypeScript compiler configuration
-├── .env.example          # Environment variable template
-├── .env                  # Local environment file (Git-ignored)
+├── .env                  # Local environment file
 ├── README.md             # Module documentation
 └── src/
-    ├── app.ts            # Express application, security middleware & health check route
+    ├── app.ts            # Express application, security middleware & API route router
     ├── server.ts         # Server entry point & graceful shutdown handlers
-    └── config/
-        └── env.ts        # Zod environment variable schema & validator
+    ├── config/
+    │   ├── env.ts        # Zod environment variable schema & validator
+    │   └── database.ts   # MongoDB Mongoose singleton connection manager
+    ├── controllers/
+    │   └── authController.ts # BCrypt password hashing & JWT registration/login
+    ├── middleware/
+    │   └── authMiddleware.ts # Bearer token verification & Role-Based Access Control (RBAC)
+    ├── models/           # Domain data models (User, Crop, Treatment, DiagnosisLog)
+    └── routes/
+        └── authRoutes.ts # Auth router (/api/v1/auth)
 ```
 
-## Getting Started
+## API Endpoints
 
-```bash
-# 1. Install Node.js dependencies
-cd 06_backend
-npm install
+### Public Endpoints
+- `GET /health`: System health check status, uptime, and memory usage telemetry.
+- `POST /api/v1/auth/register`: Register new user (`name`, `email`, `password`, `role`), returning JWT token.
+- `POST /api/v1/auth/login`: Authenticate user credentials, returning JWT token.
 
-# 2. Run dev server with hot reload
-npm run dev
-
-# 3. Test Health Check endpoint
-curl http://localhost:5000/health
-```
-
-### Features Included:
-- **Security Headers**: `helmet` security protection for HTTP headers.
-- **CORS Support**: Configurable cross-origin resource sharing.
-- **Strict Environment Validation**: Zod schema validation ensuring `PORT`, `MONGODB_URI`, and `JWT_SECRET` are validated before startup.
-- **Health Check Route**: `GET /health` returning service status, uptime, and memory usage telemetry.
-- **Graceful Shutdown**: Intercepts `SIGINT` and `SIGTERM` signals for clean HTTP socket termination.
+### Protected Endpoints
+- `GET /api/v1/auth/me` (Header: `Authorization: Bearer <token>`): Get authenticated user profile.
