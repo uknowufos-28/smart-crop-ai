@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  # SmartCropAI Production Node.js Backend Service
+  backend:
+    build:
+      context: ..
+      dockerfile: 08_deployment/Dockerfile
+    container_name: smartcropai-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongo:27017/smartcropai
+      - JWT_SECRET=production_super_secret_jwt_key_change_in_prod_12345!
+      - CORS_ORIGIN=*
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # MongoDB Database Service
+  mongo:
+    image: mongo:7.0
+    container_name: smartcropai-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  mongo_data:
+    driver: local

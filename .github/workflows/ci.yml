@@ -1,0 +1,77 @@
+name: SmartCropAI Enterprise Continuous Integration (CI)
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  backend-ci:
+    name: Node.js Express Backend Quality Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 06_backend/package-lock.json
+
+      - name: Install Backend Dependencies
+        run: |
+          cd 06_backend
+          npm ci
+
+      - name: Compile TypeScript Build
+        run: |
+          cd 06_backend
+          npm run build
+
+  python-ml-testing:
+    name: Machine Learning & Integration Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ML Testing Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r 03_model_training/requirements.txt
+          pip install -r 07_testing/requirements.txt
+
+      - name: Run Automated System Integration Tests
+        run: |
+          cd 07_testing
+          python src/test_pipeline.py
+
+  docker-build-verification:
+    name: Production Docker Container Build
+    runs-on: ubuntu-latest
+    needs: [backend-ci, python-ml-testing]
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Production Multi-Stage Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: 08_deployment/Dockerfile
+          push: false
+          tags: smartcropai-backend:latest
