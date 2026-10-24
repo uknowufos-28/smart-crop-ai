@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image as RNImage, ActivityIndicator } from 'react-native';
+import { Alert, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useTheme } from '../theme/ThemeContext';
 import { ArrowLeft, Camera, Image as ImageIcon, Zap, ZapOff } from 'lucide-react-native';
-import { tfliteService } from '../services/tfliteService';
+import { InferenceUnavailableError, tfliteService } from '../services/tfliteService';
 import { databaseService } from '../services/databaseService';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Scanner'>;
@@ -41,34 +41,34 @@ export const ScannerScreen: React.FC<Props> = ({ navigation }) => {
   const handleProcessImage = async (uri: string) => {
     try {
       setAnalyzing(true);
-      const startTime = Date.now();
       const result = await tfliteService.predict(uri);
-      const executionTime = Date.now() - startTime;
-
-      // Extract Crop and Disease Names
-      const parts = result.diseaseName.split('___');
-      const cropName = parts[0] || 'Crop';
-      const diseaseName = parts[1] ? parts[1].replace(/_/g, ' ') : 'Healthy';
-      const latencyMs = Math.min(executionTime, 12);
 
       // Auto-save to SQLite Offline Database
       await databaseService.insertDiagnosis({
-        cropName,
-        diseaseName,
+        cropName: result.cropName,
+        diseaseName: result.diseaseName,
         confidenceScore: result.confidenceScore,
-        latencyMs,
+        latencyMs: result.latencyMs,
         imageUri: uri,
       });
 
       navigation.replace('Prediction', {
         imageUri: uri,
-        cropName,
-        diseaseName,
+        cropName: result.cropName,
+        diseaseName: result.diseaseName,
         confidence: result.confidenceScore,
-        latencyMs,
+        latencyMs: result.latencyMs,
       });
     } catch (error) {
       console.error('Inference error:', error);
+      Alert.alert(
+        error instanceof InferenceUnavailableError
+          ? 'AI model not ready'
+          : 'Could not analyze image',
+        error instanceof Error
+          ? error.message
+          : 'Please try again with another photo.'
+      );
     } finally {
       setAnalyzing(false);
     }
@@ -155,7 +155,7 @@ export const ScannerScreen: React.FC<Props> = ({ navigation }) => {
         {analyzing && (
           <View style={styles.loadingOverlay}>
             <ActivityIndicator size="large" color="#FFFFFF" />
-            <Text style={styles.loadingText}>Running INT8 TFLite Edge Inference...</Text>
+            <Text style={styles.loadingText}>Analyzing leaf image...</Text>
           </View>
         )}
       </CameraView>

@@ -1,6 +1,6 @@
 # Module 04: Model Conversion & Quantization Engine (`04_model_conversion`)
 
-This module houses the TensorFlow Lite model conversion, post-training quantization (FP16 and INT8), representative calibration dataset generator, and on-host latency/prediction agreement benchmarking suites for SmartCropAI.
+This module contains experimental TensorFlow Lite conversion and benchmarking tools. The checked-in model files and reports are legacy prototype outputs, not a field-validated model and not currently wired into the mobile app.
 
 ## Directory Layout
 ```
@@ -15,10 +15,12 @@ This module houses the TensorFlow Lite model conversion, post-training quantizat
 │   ├── convert_tflite.py      # Production TFLite converter & post-training quantization engine
 │   └── benchmark_tflite.py    # On-host TFLite interpreter benchmark & agreement engine
 └── samples/                   # Exported TFLite model binaries
-    ├── crop_disease_model_float32.tflite  (9.74 MB Baseline - 6.93 ms)
-    ├── crop_disease_model_fp16.tflite     (4.94 MB - 1.97x Compression - 5.77 ms)
-    └── crop_disease_model_int8.tflite     (2.93 MB - 3.32x Compression - 3.78 ms - 265 FPS)
+    ├── crop_disease_model_float32.tflite  (legacy experimental artifact)
+    ├── crop_disease_model_fp16.tflite     (legacy experimental artifact)
+    └── crop_disease_model_int8.tflite     (legacy experimental artifact)
 ```
+
+The legacy evaluation report uses only 10 test images and records 10% accuracy. Reported quantized-model prediction agreement is agreement with a float model, not correctness. Do not use these artifacts for diagnosis. A new model must be trained from verified data with the [Tamil Nadu Colab pilot](../03_model_training/tamil_nadu_pilot_colab.ipynb), independently evaluated on field images, and integrated into the app before these files can be replaced or deleted safely.
 
 ## Running TFLite Conversion & Benchmarking
 
@@ -37,5 +39,5 @@ python src/benchmark_tflite.py
 
 ### Features Included:
 - **TFLite Interpreter Execution**: Loads `.tflite` model buffers with `tf.lite.Interpreter`, allocating tensor memory and querying input/output indexes.
-- **Latency Benchmarking**: Measures per-tensor inference latency (ms), min/max latency, and throughput FPS across Float32, Float16, and INT8 variants.
-- **Prediction Agreement**: Compares Top-1 class predictions between Keras `.keras` and quantized `.tflite` models (Achieving 100.0% matching agreement).
+- **Latency Benchmarking**: Measures model invocation latency in the current host environment; it is not a mobile-device performance result.
+- **Prediction Agreement**: Compares Top-1 predictions between source and quantized models; agreement does not demonstrate classification accuracy.

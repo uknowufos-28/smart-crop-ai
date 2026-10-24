@@ -3,21 +3,21 @@
 [![Download APK](https://img.shields.io/badge/Download_APK-v1.0.0-166534?style=for-the-badge&logo=android&logoColor=white)](https://github.com/uknowufos-28/smart-crop-ai/releases/latest)
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=github-actions)](https://github.com/uknowufos-28/smart-crop-ai)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
-[![TensorFlow Lite](https://img.shields.io/badge/TensorFlow_Lite-INT8_Quantized-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/lite)
+[![TensorFlow Lite](https://img.shields.io/badge/TensorFlow_Lite-Pilot_Target-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/lite)
 [![React Native](https://img.shields.io/badge/React_Native-Expo_SDK_51-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactnative.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![SQLite](https://img.shields.io/badge/SQLite-WAL_Mode-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-Express_v4-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 
-> **An enterprise-grade, offline-first mobile AI diagnostic solution designed to identify plant diseases in under 5ms directly on low-cost smartphones without internet connectivity.**
+> **An offline-first crop-disease app and model-training project. Field-validated diagnosis is not available yet; the pilot model must be trained and tested on verified field images before use.**
 
 ---
 
 ## 🌟 Executive Summary
 
-**SmartCropAI** is a production-grade Edge AI and cloud platform that empowers farmers in remote agricultural fields to diagnose crop leaf diseases instantly using their smartphone camera.
+**SmartCropAI** is a mobile crop-disease project intended for farmers. The current repository is a prototype, not a validated diagnostic tool: its checked-in dataset contains only 10 raw images, and the recorded evaluation accuracy is 10% on 10 test images. The app's former inference implementation returned a fixed class rather than evaluating the selected photo; it now clearly reports that a validated model is not installed instead of presenting a fabricated diagnosis.
 
-Featuring a **ChatGPT-Inspired Minimalist UI** (Light, Dark, and System theme), **Zero-Emoji Professional Design**, **SQLite Local Storage**, and **Representative INT8 TFLite Quantization**, SmartCropAI compresses neural network footprints from **9.74 MB down to 2.93 MB (3.32x compression)**—enabling on-device execution in **3.78ms (265 FPS)** with **100.0% prediction agreement** matching unquantized baselines.
+The first proposed field pilot is for selected crops in Tamil Nadu, with rice, tomato, and banana as a provisional shortlist to confirm with farmers and local crop experts. The repository includes a Colab workflow to train and evaluate a candidate from consented, verified field photos. Public datasets can help bootstrap relevant classes, but public benchmark results are not evidence of accuracy on Tamil Nadu farms.
 
 ---
 
@@ -26,13 +26,13 @@ Featuring a **ChatGPT-Inspired Minimalist UI** (Light, Dark, and System theme), 
 1. Click **[Download APK v1.0.0](https://github.com/uknowufos-28/smart-crop-ai/releases/latest)** directly to your Android device.
 2. Open the downloaded `SmartCropAI-v1.0.0.apk` file in your Android **Downloads** folder.
 3. If prompted by Android OS, tap **Settings ➔ Allow installation from unknown sources**.
-4. Tap **Install** and launch **SmartCropAI**—diagnose plant leaves 100% offline!
+4. The current app prototype does not yet make diagnoses. Do not use it to make crop-treatment decisions until a field-validated model is installed.
 
 ---
 
 ## ✨ Key Features
 
-- **⚡ On-Device Edge AI**: Executes neural network inference in **3.78ms (265 FPS)** on mobile CPU without cloud API latency.
+- **Model status**: A real field-validated inference model is not installed yet. The app does not return a placeholder diagnosis.
 - **🎨 ChatGPT Minimalist Design**: Clean Light Mode (`#FFFFFF`), Dark Mode (`#09090B`), and automatic System Theme detection (`useColorScheme`).
 - **🚫 Zero-Emoji Professional UI**: Built with clean Lucide vector icons (`Camera`, `ShieldCheck`, `Zap`, `Sun`, `Moon`, `History`, `Settings`).
 - **💾 SQLite Local Persistence**: Stores scan records locally (`expo-sqlite`) using Write-Ahead Logging (`PRAGMA journal_mode = WAL`).
@@ -47,13 +47,13 @@ Featuring a **ChatGPT-Inspired Minimalist UI** (Light, Dark, and System theme), 
 ┌──────────────────────────────────────────────────────────────────────────────────┐
 │                      MOBILE CLIENT (React Native / Expo / SQLite)                │
 │                                                                                  │
-│  [ Camera / Gallery ] ──> [ Preprocessing: Lanczos 224x224 RGB ]                 │
+│  [ Camera / Gallery ] ──> [ Planned: preprocessing for verified model ]          │
 │                                           │                                      │
 │                                           ▼                                      │
-│                           [ TFLite INT8 Engine (2.93 MB) ]                       │
+│                   [ Planned: field-validated TFLite model ]                     │
 │                                           │                                      │
 │                                           ▼                                      │
-│                           [ Auto-Save to SQLite Database ]                       │
+│             [ Save result only after validated inference succeeds ]              │
 │                                           │                                      │
 │                                           ▼                                      │
 │                           [ ChatGPT Minimalist UI Result Card ]                  │
@@ -90,16 +90,13 @@ SmartCropAI/
 
 ---
 
-## 📊 Machine Learning & Optimization Benchmarks
+## Model status and next steps
 
-Model performance evaluated on held-out test datasets using production `tf.lite.Interpreter` host CPU execution:
+The published model artifacts and benchmark reports are experimental prototype outputs; they do not establish field accuracy. The current evaluation report records **10% accuracy on 10 test images**, and the dataset audit records **10 raw images total (one per class)**. The old splits reuse the same source images, so those results are not an independent test. The reported quantized-model prediction agreement measures agreement with the source model, not correctness.
 
-| Model Variant | Format | Model Binary Size | Compression Ratio | On-Host Latency (ms) | Throughput (FPS) | Top-1 Prediction Agreement |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Keras Source Model** | Native `.keras` | 42.5 MB | 1.0x Baseline | ~45.0 ms | 22 FPS | 100.0% (Source) |
-| **Float32 Baseline** | `.tflite` | 9.74 MB | 1.0x | 6.93 ms | 144 FPS | 100.0% |
-| **Float16 Quantized** | `.tflite` | 4.94 MB | 1.97x | 5.77 ms | 173 FPS | 100.0% |
-| **Full INT8 Quantized** *(Target)* | `.tflite` | **2.93 MB** | **3.32x** | **3.78 ms** | **265 FPS** | **100.0% (Zero Loss)** |
+Use [`03_model_training/tamil_nadu_pilot_colab.ipynb`](03_model_training/tamil_nadu_pilot_colab.ipynb) to prepare a reproducible Colab run. It requires an image manifest with expert-checked labels and farm-level group splits, keeps test photos untouched during training, evaluates the exported INT8 model, and saves its class mapping and metrics to Google Drive. **Rice, tomato, and banana labels and field data still need local validation and collection.**
+
+The architecture document's accuracy and latency values are engineering targets, not achieved or verified product metrics. A future app release must use a compatible runtime, the model's exported class order and preprocessing, uncertainty rejection, and real-device latency/accuracy tests.
 
 ---
 

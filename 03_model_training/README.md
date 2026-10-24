@@ -37,3 +37,11 @@ python src/evaluate_model.py
 - **Classification Metrics**: Calculates per-class Precision, Recall, F1-Scores, and macro/weighted averages using Scikit-Learn.
 - **Confusion Matrix Heatmap**: Plots high-resolution $10 \times 10$ heatmap image (`confusion_matrix.png`).
 - **Telemetry Export**: Saves evaluation report to `evaluation_report.json`.
+
+## Tamil Nadu Field Pilot (Google Colab)
+
+Use [`tamil_nadu_pilot_colab.ipynb`](tamil_nadu_pilot_colab.ipynb) for the new, reproducible pilot workflow. It mounts a Google Drive dataset, validates expert-reviewed labels and dataset licenses/consent, checks farm-group and exact-image leakage across splits, fine-tunes MobileNetV2, evaluates untouched test and optional field-test images, and exports an INT8 TFLite model plus class-order and evaluation metadata to Drive.
+
+The provisional crop shortlist is rice, tomato, and banana; confirm crop/disease labels with local farmers and an agricultural expert. Organize images under `MyDrive/smartcropai_pilot/dataset/images/` and prepare the required `manifest.csv` as described in the notebook. Keep private photos and large datasets out of Git. Aim for at least 100 varied photos per class across at least 5 independent farm groups; smaller datasets are exploratory, not evidence of field reliability.
+
+The existing `evaluation_report.json` records 10% accuracy on 10 test images, while the dataset audit records only 10 raw images. The existing splits reuse source images and must not be treated as independent evaluation. The Colab output is an experimental candidate; review per-class errors and independent field results before app integration or agronomic use. Colab runtime measurements are not mobile-device benchmarks.

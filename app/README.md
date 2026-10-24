@@ -1,6 +1,6 @@
 # Module 05: React Native Expo Mobile Application (`05_mobile_app`)
 
-Production-grade, offline-first mobile AI crop disease diagnostic application featuring a **ChatGPT Minimalist Design Language** (Light, Dark, System theme), zero emojis, Lucide vector icons, on-device TFLite INT8 inference ($2.93\text{ MB}$, $3.78\text{ ms}$ latency), SQLite offline database persistence, and background REST API cloud telemetry sync.
+Offline-first mobile crop-disease application prototype featuring a **ChatGPT Minimalist Design Language** (Light, Dark, System theme), Lucide vector icons, SQLite local persistence, and background REST API telemetry sync. A field-validated on-device model is not installed yet; the scanner reports that status instead of returning a fabricated diagnosis.
 
 ## Directory Layout
 ```
@@ -25,7 +25,7 @@ Production-grade, offline-first mobile AI crop disease diagnostic application fe
     ├── services/
     │   ├── databaseService.ts# SQLite Local Storage Manager (smartcropai.db)
     │   ├── syncService.ts    # Background Cloud Telemetry Sync Manager
-    │   └── tfliteService.ts  # On-Device TFLite INT8 Inference Engine
+    │   └── tfliteService.ts  # Explicit model-not-installed guard until inference is integrated
     └── theme/
         └── ThemeContext.tsx  # Multi-Theme Provider Context (Light, Dark, System)
 ```
@@ -44,6 +44,8 @@ npm start
 ```
 
 ## Building Standalone Android APK (`.apk`)
+
+The current app can be built as a UI prototype, but image diagnosis is unavailable until an evaluated pilot model and compatible on-device inference/preprocessing runtime are integrated and tested on a phone.
 
 To generate an installable `.apk` file for Android smartphones:
 
