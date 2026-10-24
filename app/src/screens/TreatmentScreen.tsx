@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useTheme } from '../theme/ThemeContext';
-import { ArrowLeft, ShieldCheck, Leaf, AlertCircle } from 'lucide-react-native';
+import { ArrowLeft, ShieldCheck, AlertCircle } from 'lucide-react-native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Treatment'>;
 
@@ -20,7 +20,7 @@ export const TreatmentScreen: React.FC<Props> = ({ route, navigation }) => {
         >
           <ArrowLeft size={20} color={colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Treatment Plan</Text>
+        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Safe Next Steps</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -29,36 +29,37 @@ export const TreatmentScreen: React.FC<Props> = ({ route, navigation }) => {
         <Text style={[styles.diseaseText, { color: colors.textPrimary }]}>{diseaseName}</Text>
       </View>
 
-      {/* Organic Remedies */}
-      <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-        <View style={styles.sectionHeader}>
-          <Leaf size={20} color={colors.accent} />
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Organic Remedy</Text>
-        </View>
-        <Text style={[styles.sectionBody, { color: colors.textSecondary }]}>
-          Apply copper octanoate or neem oil spray thoroughly every 7-10 days. Ensure full coverage on upper and lower leaf surfaces.
-        </Text>
-      </View>
-
-      {/* Cultural Control Practices */}
-      <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-        <View style={styles.sectionHeader}>
-          <ShieldCheck size={20} color={colors.accent} />
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Cultural Practice</Text>
-        </View>
-        <Text style={[styles.sectionBody, { color: colors.textSecondary }]}>
-          Prune lower affected leaves within 12 inches of the soil to increase air circulation. Water plants at the base to avoid wetting foliage.
-        </Text>
-      </View>
-
-      {/* Chemical Treatment Option */}
       <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
         <View style={styles.sectionHeader}>
           <AlertCircle size={20} color={colors.statusWarning} />
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Chemical Protective Option</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Do not treat from this result alone</Text>
         </View>
         <Text style={[styles.sectionBody, { color: colors.textSecondary }]}>
-          For severe outbreaks, spray Chlorothalonil or Mancozeb protective fungicide early before rainy periods.
+          This is an experimental image-model prediction, not a confirmed diagnosis or treatment
+          recommendation. The model has not been validated on local farm images.
+        </Text>
+      </View>
+
+      <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+        <View style={styles.sectionHeader}>
+          <ShieldCheck size={20} color={colors.accent} />
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Confirm the symptoms</Text>
+        </View>
+        <Text style={[styles.sectionBody, { color: colors.textSecondary }]}>
+          Photograph several affected and healthy leaves, note which plants and parts are affected,
+          and ask a local agricultural extension officer or qualified plant-health professional to
+          verify the cause.
+        </Text>
+      </View>
+
+      <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+        <View style={styles.sectionHeader}>
+          <AlertCircle size={20} color={colors.statusWarning} />
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Pesticide safety</Text>
+        </View>
+        <Text style={[styles.sectionBody, { color: colors.textSecondary }]}>
+          Do not apply pesticides based only on this prediction. Follow local expert guidance and
+          the product label, including crop approval, protective equipment, and waiting periods.
         </Text>
       </View>
 

@@ -9,13 +9,13 @@
 [![SQLite](https://img.shields.io/badge/SQLite-WAL_Mode-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-Express_v4-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 
-> **An offline-first crop-disease app and model-training project. Field-validated diagnosis is not available yet; the pilot model must be trained and tested on verified field images before use.**
+> **Offline-first crop screening prototype with a bundled experimental PlantDoc classifier. It is not field-validated and must not be used as a confirmed diagnosis or treatment recommendation.**
 
 ---
 
 ## 🌟 Executive Summary
 
-**SmartCropAI** is a mobile crop-disease project intended for farmers. The current repository is a prototype, not a validated diagnostic tool: its checked-in dataset contains only 10 raw images, and the recorded evaluation accuracy is 10% on 10 test images. The app's former inference implementation returned a fixed class rather than evaluating the selected photo; it now clearly reports that a validated model is not installed instead of presenting a fabricated diagnosis.
+**SmartCropAI** is a mobile crop-screening prototype. The app now bundles a MobileNetV3-Small classifier trained from PlantDoc for offline image inference. PlantDoc is an internet-sourced dataset with 28 labels; it has no rice or banana classes and does not validate results on Tamil Nadu farms. The model score is not a calibrated probability or confirmed diagnosis. Earlier repository results (10% accuracy on 10 images) are historical baseline results from a tiny, overlapping dataset and are not evidence of model quality.
 
 The first proposed field pilot is for selected crops in Tamil Nadu, with rice, tomato, and banana as a provisional shortlist to confirm with farmers and local crop experts. The repository includes a Colab workflow to train and evaluate a candidate from consented, verified field photos. Public datasets can help bootstrap relevant classes, but public benchmark results are not evidence of accuracy on Tamil Nadu farms.
 
@@ -23,16 +23,13 @@ The first proposed field pilot is for selected crops in Tamil Nadu, with rice, t
 
 ## 📲 Download & Installation Guide
 
-1. Click **[Download APK v1.0.0](https://github.com/uknowufos-28/smart-crop-ai/releases/latest)** directly to your Android device.
-2. Open the downloaded `SmartCropAI-v1.0.0.apk` file in your Android **Downloads** folder.
-3. If prompted by Android OS, tap **Settings ➔ Allow installation from unknown sources**.
-4. The current app prototype does not yet make diagnoses. Do not use it to make crop-treatment decisions until a field-validated model is installed.
+The model is bundled for on-device inference in a custom native app build; Expo Go does not include the TFLite native module. Existing release APKs may not contain this model. Build the current app from source using the instructions in [`app/README.md`](app/README.md). A field-validated diagnostic release is not available.
 
 ---
 
 ## ✨ Key Features
 
-- **Model status**: A real field-validated inference model is not installed yet. The app does not return a placeholder diagnosis.
+- **Experimental offline screening**: Bundled 28-class PlantDoc TFLite classifier; not field-validated and not a leaf-localization detector.
 - **🎨 ChatGPT Minimalist Design**: Clean Light Mode (`#FFFFFF`), Dark Mode (`#09090B`), and automatic System Theme detection (`useColorScheme`).
 - **🚫 Zero-Emoji Professional UI**: Built with clean Lucide vector icons (`Camera`, `ShieldCheck`, `Zap`, `Sun`, `Moon`, `History`, `Settings`).
 - **💾 SQLite Local Persistence**: Stores scan records locally (`expo-sqlite`) using Write-Ahead Logging (`PRAGMA journal_mode = WAL`).
@@ -47,10 +44,10 @@ The first proposed field pilot is for selected crops in Tamil Nadu, with rice, t
 ┌──────────────────────────────────────────────────────────────────────────────────┐
 │                      MOBILE CLIENT (React Native / Expo / SQLite)                │
 │                                                                                  │
-│  [ Camera / Gallery ] ──> [ Planned: preprocessing for verified model ]          │
+│  [ Camera / Gallery ] ──> [ Image preprocessing ]                                │
 │                                           │                                      │
 │                                           ▼                                      │
-│                   [ Planned: field-validated TFLite model ]                     │
+│          [ Bundled experimental PlantDoc TFLite classifier ]                    │
 │                                           │                                      │
 │                                           ▼                                      │
 │             [ Save result only after validated inference succeeds ]              │
@@ -78,9 +75,9 @@ The first proposed field pilot is for selected crops in Tamil Nadu, with rice, t
 SmartCropAI/
 ├── app/          # Mobile Application (React Native / Expo / SQLite)
 ├── api/          # Cloud Backend REST API (Node.js / Express / TypeScript)
-├── ai/           # Neural Network Fine-Tuning & TFLite INT8 Engine
+├── ai/           # Legacy TFLite conversion and benchmark utilities
 ├── docs/         # System Architecture Specs & Blueprints
-├── assets/       # Quantized TFLite Binaries & Telemetry Reports Index
+├── assets/       # Experimental model and evaluation report index
 ├── test/         # Automated System Integration Testing Suite
 ├── scripts/      # Interactive Live Terminal Showcase CLI
 ├── .github/      # Continuous Integration Workflows
@@ -92,11 +89,11 @@ SmartCropAI/
 
 ## Model status and next steps
 
-The published model artifacts and benchmark reports are experimental prototype outputs; they do not establish field accuracy. The current evaluation report records **10% accuracy on 10 test images**, and the dataset audit records **10 raw images total (one per class)**. The old splits reuse the same source images, so those results are not an independent test. The reported quantized-model prediction agreement measures agreement with the source model, not correctness.
+The current PlantDoc candidate is an experimental 28-class classifier, not a detector and not a Tamil Nadu field model. The training report records its validation and official-test results and documents exact train/test image duplicates excluded from training; several duplicate files have conflicting folder labels. The original 10-image evaluation and old model benchmark figures are historical prototype results, not evidence of current model accuracy or mobile performance.
 
-Use [`03_model_training/tamil_nadu_pilot_colab.ipynb`](03_model_training/tamil_nadu_pilot_colab.ipynb) to prepare a reproducible Colab run. It requires an image manifest with expert-checked labels and farm-level group splits, keeps test photos untouched during training, evaluates the exported INT8 model, and saves its class mapping and metrics to Google Drive. **Rice, tomato, and banana labels and field data still need local validation and collection.**
+Use [`03_model_training/README.md`](03_model_training/README.md) for the local NVIDIA GPU PlantDoc training workflow and its evaluation report. The separate [`03_model_training/tamil_nadu_pilot_colab.ipynb`](03_model_training/tamil_nadu_pilot_colab.ipynb) remains the path for a future field-data pilot: it requires consented images, expert-checked labels, independent farm-group splits, and local validation. **Rice, tomato, and banana field data still need to be collected and validated.**
 
-The architecture document's accuracy and latency values are engineering targets, not achieved or verified product metrics. A future app release must use a compatible runtime, the model's exported class order and preprocessing, uncertainty rejection, and real-device latency/accuracy tests.
+The PlantDoc classifier and its score are experimental. Its exported class order and preprocessing are bundled with the app, but real-device inference, latency, offline operation, and independent field accuracy still need validation before an agronomic claim or treatment decision.
 
 ---
 

@@ -23,7 +23,7 @@ logger = logging.getLogger("SystemIntegrationTest")
 
 
 class SystemIntegrationTestSuite:
-    """Production automated test runner for SmartCropAI components."""
+    """Integration checks for the bundled experimental PlantDoc app model."""
 
     def __init__(self):
         self.root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -38,19 +38,20 @@ class SystemIntegrationTestSuite:
           "duration_ms": round(duration_ms, 2),
         }
         self.results.append(result)
-        icon = "✅" if status == "PASSED" else "❌"
-        logger.info(f"{icon} [{status}] {test_name}: {details} ({duration_ms:.2f} ms)")
+        logger.info("[%s] %s: %s (%.2f ms)", status, test_name, details, duration_ms)
 
     def test_01_dataset_integrity(self):
-        """Test Case 1: Asserts dataset images exist, are valid RGB, and match 224x224 dimensions."""
+        """Test Case 1: Verifies local PlantDoc test images when the dataset is present."""
         start = time.perf_counter()
-        test_dir = os.path.join(self.root_dir, "02_dataset", "processed", "test")
+        test_dir = os.path.join(
+            self.root_dir, "02_dataset", "raw_download", "PlantDoc-Dataset", "test"
+        )
 
         if not os.path.exists(test_dir):
             self.log_test_result(
                 "Dataset Integrity",
-                "FAILED",
-                f"Directory not found: {test_dir}",
+                "SKIPPED/OPTIONAL",
+                "PlantDoc is not checked into Git; download it to run the dataset audit.",
                 (time.perf_counter() - start) * 1000,
             )
             return
@@ -65,8 +66,6 @@ class SystemIntegrationTestSuite:
                     try:
                         with Image.open(os.path.join(root, f)) as img:
                             img.verify()
-                            if img.size != (224, 224):
-                                corrupted_count += 1
                     except Exception:
                         corrupted_count += 1
 
@@ -75,7 +74,7 @@ class SystemIntegrationTestSuite:
             self.log_test_result(
                 "Dataset Integrity",
                 "PASSED",
-                f"Verified {image_count} test images (224x224 RGB, 0 corruptions).",
+                f"Verified {image_count} official test images; 0 corruptions.",
                 duration,
             )
         else:
@@ -86,69 +85,80 @@ class SystemIntegrationTestSuite:
                 duration,
             )
 
-    def test_02_keras_model_contract(self):
-        """Test Case 2: Asserts trained Keras model exists and input/output tensor shapes match specs."""
+    def test_02_plantdoc_metadata(self):
+        """Test Case 2: Confirms bundled class order matches the training report."""
         start = time.perf_counter()
-        model_path = os.path.join(
-            self.root_dir, "03_model_training", "saved_models", "mobilenetv2_crop_disease.keras"
+        labels_path = os.path.join(
+            self.root_dir, "app", "assets", "models", "class_labels.json"
+        )
+        report_path = os.path.join(
+            self.root_dir, "app", "assets", "models", "evaluation_report.json"
         )
 
-        if not os.path.exists(model_path):
+        if not os.path.isfile(labels_path) or not os.path.isfile(report_path):
             self.log_test_result(
-                "Keras Model Contract",
+                "PlantDoc Metadata",
                 "FAILED",
-                f"Model file missing: {model_path}",
+                "Bundled class_labels.json or evaluation_report.json is missing.",
                 (time.perf_counter() - start) * 1000,
             )
             return
 
         try:
-            import tensorflow as tf
-
-            model = tf.keras.models.load_model(model_path)
-            input_shape = model.input_shape
-            output_shape = model.output_shape
+            with open(labels_path, encoding="utf-8") as file:
+                labels = json.load(file)
+            with open(report_path, encoding="utf-8") as file:
+                report = json.load(file)
+            classes = labels["classes"]
+            expected_mapping = {name: index for index, name in enumerate(classes)}
 
             duration = (time.perf_counter() - start) * 1000
-            if input_shape == (None, 224, 224, 3) and output_shape == (None, 10):
+            if (
+                len(classes) == 28
+                and labels["class_to_index"] == expected_mapping
+                and report["class_order"] == classes
+                and report["status"] == "experimental_public_dataset_only_not_field_validated"
+            ):
                 self.log_test_result(
-                    "Keras Model Contract",
+                    "PlantDoc Metadata",
                     "PASSED",
-                    f"Model input {input_shape} -> output {output_shape} contract valid.",
+                    "The 28-class mapping matches the experimental evaluation report.",
                     duration,
                 )
             else:
                 self.log_test_result(
-                    "Keras Model Contract",
+                    "PlantDoc Metadata",
                     "FAILED",
-                    f"Unexpected model shapes: input {input_shape}, output {output_shape}",
+                    "Bundled class order, mapping, or experimental status is inconsistent.",
                     duration,
                 )
         except Exception as err:
             self.log_test_result(
-                "Keras Model Contract",
+                "PlantDoc Metadata",
                 "FAILED",
-                f"Model loading exception: {err}",
+                f"Metadata validation failed: {err}",
                 (time.perf_counter() - start) * 1000,
             )
 
-    def test_03_tflite_int8_quantization(self):
-        """Test Case 3: Asserts quantized INT8 TFLite model binary exists and interpreter allocates tensors."""
+    def test_03_tflite_model_contract(self):
+        """Test Case 3: Allocates and invokes the bundled float32 TFLite model."""
         start = time.perf_counter()
         tflite_path = os.path.join(
-            self.root_dir, "04_model_conversion", "samples", "crop_disease_model_int8.tflite"
+            self.root_dir,
+            "app",
+            "assets",
+            "models",
+            "plantdoc_mobilenetv3_small.tflite",
         )
 
-        if not os.path.exists(tflite_path):
+        if not os.path.isfile(tflite_path):
             self.log_test_result(
-                "TFLite INT8 Quantization",
+                "TFLite Model Contract",
                 "FAILED",
                 f"TFLite binary missing: {tflite_path}",
                 (time.perf_counter() - start) * 1000,
             )
             return
-
-        file_size_mb = os.path.getsize(tflite_path) / (1024 * 1024)
 
         try:
             import tensorflow as tf
@@ -156,25 +166,43 @@ class SystemIntegrationTestSuite:
             interpreter = tf.lite.Interpreter(model_path=tflite_path)
             interpreter.allocate_tensors()
             input_details = interpreter.get_input_details()
+            output_details = interpreter.get_output_details()
+            input_shape = input_details[0]["shape"].tolist()
+            output_shape = output_details[0]["shape"].tolist()
+            valid_input_shapes = ([1, 150528], [1, 3, 224, 224], [1, 224, 224, 3])
 
-            duration = (time.perf_counter() - start) * 1000
-            if file_size_mb <= 5.0 and input_details[0]["shape"].tolist() == [1, 224, 224, 3]:
+            if (
+                input_shape in valid_input_shapes
+                and output_shape == [1, 28]
+                and input_details[0]["dtype"] == np.float32
+                and output_details[0]["dtype"] == np.float32
+            ):
+                interpreter.set_tensor(
+                    input_details[0]["index"],
+                    np.zeros(input_shape, dtype=np.float32),
+                )
+                interpreter.invoke()
+                output = interpreter.get_tensor(output_details[0]["index"])
+                if not np.isfinite(output).all():
+                    raise ValueError("TFLite invocation returned non-finite output.")
+                duration = (time.perf_counter() - start) * 1000
                 self.log_test_result(
-                    "TFLite INT8 Quantization",
+                    "TFLite Model Contract",
                     "PASSED",
-                    f"Binary size {file_size_mb:.2f} MB <= 5MB target, TFLite tensor allocation clean.",
+                    f"Float32 model input {input_shape} -> output {output_shape}; invocation succeeded.",
                     duration,
                 )
             else:
+                duration = (time.perf_counter() - start) * 1000
                 self.log_test_result(
-                    "TFLite INT8 Quantization",
+                    "TFLite Model Contract",
                     "FAILED",
-                    f"Binary size {file_size_mb:.2f} MB exceeds spec or input shape invalid.",
+                    f"Unexpected model tensor contract: input {input_shape}, output {output_shape}.",
                     duration,
                 )
         except Exception as err:
             self.log_test_result(
-                "TFLite INT8 Quantization",
+                "TFLite Model Contract",
                 "FAILED",
                 f"TFLite Interpreter error: {err}",
                 (time.perf_counter() - start) * 1000,
@@ -218,8 +246,8 @@ class SystemIntegrationTestSuite:
         """Executes full integration suite and outputs test_results.json report."""
         logger.info("Starting System Integration Test Suite...")
         self.test_01_dataset_integrity()
-        self.test_02_keras_model_contract()
-        self.test_03_tflite_int8_quantization()
+        self.test_02_plantdoc_metadata()
+        self.test_03_tflite_model_contract()
         self.test_04_backend_health_api()
 
         passed_count = sum(1 for r in self.results if r["status"] == "PASSED")

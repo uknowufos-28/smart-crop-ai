@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'rea
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useTheme } from '../theme/ThemeContext';
-import { ArrowLeft, ShieldCheck, Zap, BookOpen, RefreshCw } from 'lucide-react-native';
+import { ArrowLeft, ShieldCheck, Zap, BookOpen, RefreshCw, AlertCircle } from 'lucide-react-native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Prediction'>;
 
@@ -20,7 +20,7 @@ export const PredictionScreen: React.FC<Props> = ({ route, navigation }) => {
         >
           <ArrowLeft size={20} color={colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Diagnostic Result</Text>
+        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Experimental AI Screening</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -45,7 +45,7 @@ export const PredictionScreen: React.FC<Props> = ({ route, navigation }) => {
 
         <View style={styles.metricContainer}>
           <View style={styles.metricHeader}>
-            <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Diagnostic Confidence</Text>
+            <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Model score (not calibrated)</Text>
             <Text style={[styles.metricPercent, { color: colors.accent }]}>{(confidence * 100).toFixed(1)}%</Text>
           </View>
           <View style={[styles.progressBarBackground, { backgroundColor: colors.surface }]}>
@@ -59,13 +59,22 @@ export const PredictionScreen: React.FC<Props> = ({ route, navigation }) => {
         </View>
       </View>
 
+      <View style={[styles.noticeCard, { backgroundColor: colors.card, borderColor: colors.statusWarning }]}>
+        <AlertCircle size={20} color={colors.statusWarning} />
+        <Text style={[styles.noticeText, { color: colors.textSecondary }]}>
+          This PlantDoc-trained model is experimental and has not been validated on local farm
+          images. Its score is not a confirmed diagnosis. Check the plant with a local agricultural
+          expert before taking action.
+        </Text>
+      </View>
+
       {/* Action Buttons */}
       <TouchableOpacity
         style={[styles.primaryButton, { backgroundColor: colors.accent }]}
         onPress={() => navigation.navigate('Treatment', { diseaseName, cropName })}
       >
         <BookOpen size={20} color="#FFFFFF" />
-        <Text style={styles.primaryButtonText}>View Treatment Remedies</Text>
+        <Text style={styles.primaryButtonText}>View safe next steps</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -172,6 +181,20 @@ const styles = StyleSheet.create({
   metricPercent: {
     fontSize: 14,
     fontWeight: '700',
+  },
+  noticeCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+  },
+  noticeText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 20,
   },
   progressBarBackground: {
     height: 8,

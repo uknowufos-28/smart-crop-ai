@@ -1,0 +1,17 @@
+scikit-learn>=1.5,<2
+onnx==1.19.1
+onnxruntime==1.23.0
+tensorflow-cpu==2.19.0
+ai-edge-litert==2.1.2
+numpy==1.26.4
+opencv-python==4.11.0.86
+onnxsim==0.4.36
+onnxoptimizer==0.4.2
+onnx-graphsurgeon==0.5.8
+requests==2.32.5
+simple-onnx-processing-tools==1.1.32
+psutil==5.9.5
+protobuf==4.25.5
+h5py==3.11.0
+ml-dtypes==0.5.1
+flatbuffers==25.12.19

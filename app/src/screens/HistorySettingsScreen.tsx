@@ -96,7 +96,7 @@ export const HistorySettingsScreen: React.FC<Props> = ({ navigation }) => {
               <Text style={[styles.historyCrop, { color: colors.accent }]}>{item.cropName}</Text>
               <Text style={[styles.historyDisease, { color: colors.textPrimary }]}>{item.diseaseName}</Text>
               <Text style={[styles.historyMeta, { color: colors.textSecondary }]}>
-                {(item.confidenceScore * 100).toFixed(1)}% Confidence • {item.latencyMs.toFixed(1)}ms
+                {(item.confidenceScore * 100).toFixed(1)}% model score • {item.latencyMs.toFixed(1)}ms
               </Text>
             </View>
             <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
@@ -110,7 +110,7 @@ export const HistorySettingsScreen: React.FC<Props> = ({ navigation }) => {
       <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>About Application</Text>
       <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
         <Text style={[styles.aboutTitle, { color: colors.textPrimary }]}>SmartCropAI Mobile</Text>
-        <Text style={[styles.aboutSub, { color: colors.textSecondary }]}>Version 1.0.0 (SQLite Active & TFLite INT8 2.93MB)</Text>
+        <Text style={[styles.aboutSub, { color: colors.textSecondary }]}>Version 1.0.0 • Experimental PlantDoc model with offline inference</Text>
       </View>
     </ScrollView>
   );

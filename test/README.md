@@ -26,5 +26,7 @@ python src/test_pipeline.py
 ### Test Cases Executed:
 1. **Dataset Integrity Assertion**: Verifies processed images exist in `02_dataset/processed/test/`, confirming $224 \times 224$ RGB dimensions and zero corruptions.
 2. **Keras Model Contract Verification**: Loads `mobilenetv2_crop_disease.keras`, verifying input shape $(224, 224, 3)$ and 10 class Softmax output layer.
-3. **TFLite INT8 Quantization Specification**: Validates `crop_disease_model_int8.tflite` binary size ($2.93\text{ MB} \le 5\text{MB}$ spec) and allocates `tf.lite.Interpreter` tensors.
-4. **Backend REST API Health Check**: Queries `http://localhost:5000/health`, verifying HTTP 200 responses.
+3. **Bundled TFLite Model Contract**: Allocates and invokes the PlantDoc float32 model, checking its input/output tensor shapes and finite output.
+4. **Backend REST API Health Check**: Queries `http://localhost:5000/health`, verifying HTTP 200 responses when the backend is running.
+
+The PlantDoc archive is intentionally excluded from Git; dataset integrity is marked optional when the local download is absent. The test suite does not certify field accuracy or mobile-device behavior.

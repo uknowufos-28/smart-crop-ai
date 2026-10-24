@@ -1,6 +1,6 @@
 # Module 04: Model Conversion & Quantization Engine (`04_model_conversion`)
 
-This module contains experimental TensorFlow Lite conversion and benchmarking tools. The checked-in model files and reports are legacy prototype outputs, not a field-validated model and not currently wired into the mobile app.
+This directory contains legacy TensorFlow Lite conversion and benchmarking tools. Their former model binaries are retired; the current experimental PlantDoc model is bundled in `app/assets/models/` and its training report is generated under `03_model_training/saved_models/plantdoc/`. Neither the legacy benchmarks nor the PlantDoc candidate establish field accuracy or mobile-device performance.
 
 ## Directory Layout
 ```
@@ -14,13 +14,9 @@ This module contains experimental TensorFlow Lite conversion and benchmarking to
 │   ├── conversion_config.py   # Dataclass configuration schema & path definitions
 │   ├── convert_tflite.py      # Production TFLite converter & post-training quantization engine
 │   └── benchmark_tflite.py    # On-host TFLite interpreter benchmark & agreement engine
-└── samples/                   # Exported TFLite model binaries
-    ├── crop_disease_model_float32.tflite  (legacy experimental artifact)
-    ├── crop_disease_model_fp16.tflite     (legacy experimental artifact)
-    └── crop_disease_model_int8.tflite     (legacy experimental artifact)
 ```
 
-The legacy evaluation report uses only 10 test images and records 10% accuracy. Reported quantized-model prediction agreement is agreement with a float model, not correctness. Do not use these artifacts for diagnosis. A new model must be trained from verified data with the [Tamil Nadu Colab pilot](../03_model_training/tamil_nadu_pilot_colab.ipynb), independently evaluated on field images, and integrated into the app before these files can be replaced or deleted safely.
+The previous evaluation report used only 10 test images and recorded 10% accuracy. Reported quantized-model prediction agreement measured agreement with a float model, not correctness. Those prototype results are historical and are not a product benchmark. The current PlantDoc model is an experimental classifier, not a field-validated diagnostic.
 
 ## Running TFLite Conversion & Benchmarking
 

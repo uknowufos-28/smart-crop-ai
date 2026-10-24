@@ -18,17 +18,22 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
   }, []);
 
   const checkAndTriggerSync = async () => {
-    const count = await syncService.getUnsyncedCount();
-    setUnsyncedCount(count);
+    try {
+      const count = await syncService.getUnsyncedCount();
+      setUnsyncedCount(count);
 
-    if (count > 0) {
-      setSyncStatusText(`Syncing ${count} pending scan logs...`);
-      const result = await syncService.syncPendingDiagnoses();
-      setSyncStatusText(result.message);
-      const newCount = await syncService.getUnsyncedCount();
-      setUnsyncedCount(newCount);
-    } else {
-      setSyncStatusText('All local scans synchronized');
+      if (count > 0) {
+        const result = await syncService.syncPendingDiagnoses();
+        setSyncStatusText(result.message);
+        setUnsyncedCount(result.remainingQueueCount);
+      } else {
+        setSyncStatusText('No pending scans on this device');
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown local scan status error.';
+      console.error('Failed to check local sync queue:', error);
+      setSyncStatusText(`Could not check local scan queue: ${message}`);
     }
   };
 
@@ -71,12 +76,12 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.primaryCardHeader}>
           <View style={styles.badge}>
             <Cpu size={14} color="#FFFFFF" />
-            <Text style={styles.badgeText}>INT8 TFLite Engine ({"<5ms"})</Text>
+            <Text style={styles.badgeText}>PlantDoc classifier • Experimental</Text>
           </View>
         </View>
         <Text style={styles.primaryCardTitle}>Scan Crop Leaf</Text>
         <Text style={styles.primaryCardSubtitle}>
-          Instant offline AI diagnosis directly on your device processor
+          Experimental offline leaf-image screening. Confirm results with a local agriculture expert.
         </Text>
         <View style={styles.primaryCardFooter}>
           <Camera size={24} color="#FFFFFF" />
@@ -107,17 +112,13 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
       {/* Performance Telemetry Status Card */}
       <View style={[styles.statusCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-        <Text style={[styles.statusTitle, { color: colors.textPrimary }]}>Edge Performance Telemetry</Text>
+        <Text style={[styles.statusTitle, { color: colors.textPrimary }]}>App status</Text>
         <View style={styles.metricRow}>
-          <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Model Binary Footprint</Text>
-          <Text style={[styles.metricValue, { color: colors.accent }]}>2.93 MB (Full INT8)</Text>
+          <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Leaf screening</Text>
+          <Text style={[styles.metricValue, { color: colors.accent }]}>On-device, no network required</Text>
         </View>
         <View style={styles.metricRow}>
-          <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Host CPU Execution Latency</Text>
-          <Text style={[styles.metricValue, { color: colors.accent }]}>3.78 ms (265 FPS)</Text>
-        </View>
-        <View style={styles.metricRow}>
-          <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Offline Persistence</Text>
+          <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Scan history</Text>
           <Text style={[styles.metricValue, { color: colors.statusSuccess }]}>SQLite Active</Text>
         </View>
       </View>

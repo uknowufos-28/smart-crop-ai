@@ -35,6 +35,9 @@ env/
 venv/
 ENV/
 .venv/
+03_model_training/saved_models/
+03_model_training/checkpoints/
+03_model_training/logs/
 .pytest_cache/
 .coverage
 htmlcov/
