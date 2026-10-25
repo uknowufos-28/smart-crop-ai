@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './src/navigation/types';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
+import { LanguageProvider } from './src/i18n/LanguageContext';
 
 import { SplashScreen } from './src/screens/SplashScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
@@ -42,9 +43,11 @@ const AppNavigation = () => {
 export default function App() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider>
-        <AppNavigation />
-      </ThemeProvider>
+      <LanguageProvider>
+        <ThemeProvider>
+          <AppNavigation />
+        </ThemeProvider>
+      </LanguageProvider>
     </SafeAreaProvider>
   );
 }

@@ -4,18 +4,21 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useTheme } from '../theme/ThemeContext';
 import { ShieldCheck } from 'lucide-react-native';
+import { useLanguage } from '../i18n/LanguageContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
 
 export const SplashScreen: React.FC<Props> = ({ navigation }) => {
   const { colors } = useTheme();
+  const { t, isLanguageLoaded } = useLanguage();
 
   useEffect(() => {
+    if (!isLanguageLoaded) return undefined;
     const timer = setTimeout(() => {
       navigation.replace('Home');
     }, 1500);
     return () => clearTimeout(timer);
-  }, [navigation]);
+  }, [isLanguageLoaded, navigation]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -24,7 +27,7 @@ export const SplashScreen: React.FC<Props> = ({ navigation }) => {
       </View>
       <Text style={[styles.title, { color: colors.textPrimary }]}>SmartCropAI</Text>
       <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-        Offline Edge AI Diagnostic Engine
+        {t('splashSubtitle')}
       </Text>
       <ActivityIndicator size="small" color={colors.accent} style={styles.loader} />
     </View>

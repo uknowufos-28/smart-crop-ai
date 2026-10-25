@@ -10,6 +10,8 @@ import {
 
 import plantdocModel from "../../assets/models/plantdoc_mobilenetv3_small.tflite";
 
+export const MODEL_VERSION = "plantdoc-mobilenetv3-small-v1";
+
 export interface PredictionResult {
   classIndex: number;
   rawLabel: string;
@@ -20,6 +22,15 @@ export interface PredictionResult {
   isHealthy: boolean | null;
   latencyMs: number;
   timestamp: string;
+  alternatives: PredictionAlternative[];
+}
+
+export interface PredictionAlternative {
+  classIndex: number;
+  rawLabel: string;
+  cropName: string;
+  diseaseName: string;
+  confidenceScore: number;
 }
 
 export class InferenceUnavailableError extends Error {
@@ -117,12 +128,29 @@ class TFLiteMobileInferenceEngine {
       throw new Error("PlantDoc inference returned invalid scores.");
     }
 
-    const classIndex = expValues.indexOf(Math.max(...expValues));
+    const alternatives = expValues
+      .map((score, classIndex) => {
+        const classInfo = getClassInfoByIndex(classIndex);
+        if (classInfo.rawLabel === "Unknown___Unknown") {
+          throw new Error(`PlantDoc returned an unmapped class index: ${classIndex}.`);
+        }
+        return {
+          classIndex,
+          rawLabel: classInfo.rawLabel,
+          cropName: classInfo.cropName,
+          diseaseName: classInfo.diseaseName,
+          confidenceScore: score / probabilityTotal,
+        };
+      })
+      .sort((left, right) => right.confidenceScore - left.confidenceScore)
+      .slice(0, 3);
+    const [topPrediction] = alternatives;
+    if (!topPrediction) {
+      throw new Error("PlantDoc inference returned no class scores.");
+    }
+    const classIndex = topPrediction.classIndex;
     const confidenceScore = expValues[classIndex] / probabilityTotal;
     const classInfo = getClassInfoByIndex(classIndex);
-    if (classInfo.rawLabel === "Unknown___Unknown") {
-      throw new Error(`PlantDoc returned an unmapped class index: ${classIndex}.`);
-    }
 
     return {
       classIndex,
@@ -134,6 +162,7 @@ class TFLiteMobileInferenceEngine {
       isHealthy: classInfo.isHealthy,
       latencyMs: Date.now() - startTime,
       timestamp: new Date().toISOString(),
+      alternatives,
     };
   }
 }

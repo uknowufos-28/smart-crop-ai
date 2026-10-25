@@ -9,6 +9,71 @@ const NORMALIZATION_MEAN = [0.485, 0.456, 0.406];
 const NORMALIZATION_STD = [0.229, 0.224, 0.225];
 
 export type TfliteInputLayout = "NCHW" | "NHWC";
+export type ImageQualityWarning = "dark" | "bright" | "blurry" | "small";
+
+export const assessLeafImageQuality = async (
+  imageUri: string
+): Promise<ImageQualityWarning[]> => {
+  const original = await ImageManipulator.manipulateAsync(imageUri, [], {
+    compress: 0.55,
+    format: ImageManipulator.SaveFormat.JPEG,
+  });
+  const sample = await ImageManipulator.manipulateAsync(
+    imageUri,
+    [{ resize: { width: 160, height: 160 } }],
+    {
+      compress: 0.55,
+      format: ImageManipulator.SaveFormat.JPEG,
+      base64: true,
+    }
+  );
+  if (!sample.base64) {
+    throw new Error("Could not inspect the selected photo.");
+  }
+
+  const decoded = decode(toByteArray(sample.base64), { useTArray: true });
+  const warnings: ImageQualityWarning[] = [];
+  if (Math.min(original.width, original.height) < 320) warnings.push("small");
+
+  let brightnessTotal = 0;
+  const luminance = new Float32Array(sample.width * sample.height);
+  for (let index = 0; index < luminance.length; index += 1) {
+    const pixelOffset = index * 4;
+    const value =
+      decoded.data[pixelOffset] * 0.299 +
+      decoded.data[pixelOffset + 1] * 0.587 +
+      decoded.data[pixelOffset + 2] * 0.114;
+    luminance[index] = value;
+    brightnessTotal += value;
+  }
+  const averageBrightness = brightnessTotal / luminance.length;
+  if (averageBrightness < 45) warnings.push("dark");
+  if (averageBrightness > 225) warnings.push("bright");
+
+  let laplacianTotal = 0;
+  let laplacianSquaredTotal = 0;
+  let sampleCount = 0;
+  for (let y = 1; y < decoded.height - 1; y += 1) {
+    for (let x = 1; x < decoded.width - 1; x += 1) {
+      const index = y * decoded.width + x;
+      const laplacian =
+        luminance[index - decoded.width] +
+        luminance[index + decoded.width] +
+        luminance[index - 1] +
+        luminance[index + 1] -
+        4 * luminance[index];
+      laplacianTotal += laplacian;
+      laplacianSquaredTotal += laplacian * laplacian;
+      sampleCount += 1;
+    }
+  }
+  const laplacianMean = laplacianTotal / sampleCount;
+  const sharpnessVariance =
+    laplacianSquaredTotal / sampleCount - laplacianMean * laplacianMean;
+  if (sharpnessVariance < 28) warnings.push("blurry");
+
+  return warnings;
+};
 
 export const preprocessLeafImage = async (
   imageUri: string,

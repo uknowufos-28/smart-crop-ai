@@ -3,71 +3,74 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useTheme } from '../theme/ThemeContext';
+import { useLanguage } from '../i18n/LanguageContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, ShieldCheck, AlertCircle } from 'lucide-react-native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Treatment'>;
 
 export const TreatmentScreen: React.FC<Props> = ({ route, navigation }) => {
   const { colors } = useTheme();
+  const { t, localizeClassName } = useLanguage();
+  const insets = useSafeAreaInsets();
   const { diseaseName, cropName } = route.params;
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={styles.content}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={[styles.content, { paddingTop: Math.max(insets.top, 20) }]}>
       <View style={styles.header}>
         <TouchableOpacity
           style={[styles.iconButton, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
           onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel={t('back')}
         >
           <ArrowLeft size={20} color={colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Safe Next Steps</Text>
+        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>{t('safeNextSteps')}</Text>
         <View style={styles.placeholder} />
       </View>
 
       <View style={[styles.bannerCard, { backgroundColor: colors.accentSubtle, borderColor: colors.cardBorder }]}>
-        <Text style={[styles.cropText, { color: colors.accent }]}>{cropName}</Text>
-        <Text style={[styles.diseaseText, { color: colors.textPrimary }]}>{diseaseName}</Text>
+        <Text style={[styles.cropText, { color: colors.accent }]}>{localizeClassName(cropName)}</Text>
+        <Text style={[styles.diseaseText, { color: colors.textPrimary }]}>{localizeClassName(diseaseName)}</Text>
       </View>
 
       <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
         <View style={styles.sectionHeader}>
           <AlertCircle size={20} color={colors.statusWarning} />
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Do not treat from this result alone</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{t('confirmTitle')}</Text>
         </View>
         <Text style={[styles.sectionBody, { color: colors.textSecondary }]}>
-          This is an experimental image-model prediction, not a confirmed diagnosis or treatment
-          recommendation. The model has not been validated on local farm images.
+          {t('confirmBody')}
         </Text>
       </View>
 
       <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
         <View style={styles.sectionHeader}>
           <ShieldCheck size={20} color={colors.accent} />
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Confirm the symptoms</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{t('checkSymptomsTitle')}</Text>
         </View>
         <Text style={[styles.sectionBody, { color: colors.textSecondary }]}>
-          Photograph several affected and healthy leaves, note which plants and parts are affected,
-          and ask a local agricultural extension officer or qualified plant-health professional to
-          verify the cause.
+          {t('checkSymptomsBody')}
         </Text>
       </View>
 
       <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
         <View style={styles.sectionHeader}>
           <AlertCircle size={20} color={colors.statusWarning} />
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Pesticide safety</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{t('pesticideTitle')}</Text>
         </View>
         <Text style={[styles.sectionBody, { color: colors.textSecondary }]}>
-          Do not apply pesticides based only on this prediction. Follow local expert guidance and
-          the product label, including crop approval, protective equipment, and waiting periods.
+          {t('pesticideBody')}
         </Text>
       </View>
 
       <TouchableOpacity
         style={[styles.doneButton, { backgroundColor: colors.accent }]}
         onPress={() => navigation.navigate('Home')}
+        accessibilityRole="button"
       >
-        <Text style={styles.doneButtonText}>Return to Home</Text>
+        <Text style={styles.doneButtonText}>{t('returnHome')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -79,7 +82,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-    paddingTop: 50,
+    paddingTop: 20,
   },
   header: {
     flexDirection: 'row',
@@ -92,8 +95,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   iconButton: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     borderRadius: 12,
     borderWidth: 1,
     justifyContent: 'center',
